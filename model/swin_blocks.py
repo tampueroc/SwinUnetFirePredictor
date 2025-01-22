@@ -21,7 +21,10 @@ class PreNorm3D(nn.Module):
         self.fn = fn
 
     def forward(self, x, **kwargs):
-        return self.fn(self.norm(x), **kwargs)
+        x = rearrange(x, 'b c d h w -> b d h w c')
+        x = self.norm(x)
+        x = rearrange(x, 'b d h w c -> b c d h w')
+        return self.fn(x, **kwargs)
 
 class FeedForward3D(nn.Module):
     def __init__(self, dim, hidden_dim, dropout: float = 0.0):
