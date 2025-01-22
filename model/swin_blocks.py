@@ -37,7 +37,9 @@ class FeedForward3D(nn.Module):
         self.drop = nn.Dropout(dropout) if dropout > 0 else nn.Identity()
 
     def forward(self, x):
+        x = rearrange(x, 'b c d h w -> b d h w c')
         x = self.net(x)
+        x = rearrange(x, 'b d h w c -> b c d h w')
         x = self.drop(x)
         return x
 
@@ -66,15 +68,25 @@ class WindowAttention3D(nn.Module):
         if self.shifted:
             x = self.cyclic_shift(x)
 
-        qkv = self.to_qkv(x).chunk(3, dim=-1)
-        q, k, v = map(lambda t: rearrange(t, 'b ... (h d) -> b h (...) d', h=self.heads), qkv)
+        qkv = self.to_qkv(x)
+        q, k, v = qkv.chunk(3, dim=-1)  # Split into query, key, value
 
-        dots = einsum('b h i d, b h j d -> b h i j', q, k) * self.scale
-        attn = self.softmax(dots)
-        out = einsum('b h i j, b h j d -> b h i d', attn, v)
-        out = rearrange(out, 'b h (...) d -> b (...) (h d)')
-        out = self.to_out(out)
+        # Reshape for multi-head attention
+        q = rearrange(q, 'b n (h d) -> b h n d', h=self.heads)  # [B, heads, tokens, head_dim]
+        k = rearrange(k, 'b n (h d) -> b h n d', h=self.heads)
+        v = rearrange(v, 'b n (h d) -> b h n d', h=self.heads)
 
+        # Compute attention
+        dots = einsum('b h i d, b h j d -> b h i j', q, k) * self.scale  # [B, heads, tokens, tokens]
+        attn = self.softmax(dots)  # Softmax over tokens
+        out = einsum('b h i j, b h j d -> b h i d', attn, v)  # [B, heads, tokens, head_dim]
+
+        # Merge heads and project back
+        out = rearrange(out, 'b h n d -> b n (h d)')  # [B, tokens, inner_dim]
+        out = self.to_out(out)  # Project to original feature size
         if self.shifted:
             out = self.cyclic_back_shift(out)
+
+        # Rearrange back to original spatial shape
+        out = rearrange(out, 'b (d h w) c -> b c d h w', d=d, h=h, w=w)  # Restore to [B, C, D, H, W]
         return out
