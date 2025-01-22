@@ -60,7 +60,7 @@ def main(args):
         hidden_dim=model_cfg['hidden_dim'],
         layers=model_cfg['layers'],
         heads=model_cfg['heads'],
-        head_dim=model_cfg['heads'],
+        head_dim=model_cfg['head_dim'],
         window_size=model_cfg['window_size'],
         dropout=model_cfg['dropout']
     )
