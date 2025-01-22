@@ -10,19 +10,17 @@ from .utils.loss_functions import WeightedFocalLoss, BCEWithWeights
 
 
 class SwinUnetFirePredictor(pl.LightningModule):
-    def __init__(self, in_channels, wind_dim, landscape_dim, hidden_dim, layers, heads, head_dim, window_size, dropout=0.0):
+    def __init__(self, in_channels, wind_dim, landscape_dim, hidden_dim, layers, heads, head_dim, window_size, dropout=0.0, loss_type='bce'):
         super().__init__()
+        self.save_hyperparameters()
 
         # Loss Function
-        loss_type = self.hparams.global_params.get("loss_type", "bce")
         if loss_type == "focal":
-            focal_cfg = self.hparams.global_params.get("focal", {})
-            alpha = focal_cfg.get("alpha", 0.25)  # Default alpha for Focal Loss
-            gamma = focal_cfg.get("gamma", 2.0)   # Default gamma for Focal Loss
+            alpha = 0.25
+            gamma = 2.0
             self.loss_fn = WeightedFocalLoss(alpha=alpha, gamma=gamma)
         elif loss_type == "weighted_bce":
-            pos_weight = self.hparams.global_params.get("pos_weight", None)
-            self.loss_fn = BCEWithWeights(pos_weight=pos_weight)
+            pass
         else:
             self.loss_fn = BCEWithWeights()  # Default BCE
 

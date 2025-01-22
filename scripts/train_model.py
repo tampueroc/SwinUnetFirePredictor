@@ -13,6 +13,7 @@ def load_yaml_config(path):
 
 def main(args):
     global_config = load_yaml_config(args.global_config)
+    model_cfg = load_yaml_config(args.model_cfg)
     train_config = load_yaml_config(args.train_config)
     data_config = load_yaml_config(args.data_config)
     logger_config = train_config['logger']
@@ -52,7 +53,17 @@ def main(args):
     )
     datamodule.setup()
 
-    model = SwinUnetFirePredictor()
+    model = SwinUnetFirePredictor(
+        in_channels=data_config['sequence_length'],
+        wind_dim=model_cfg['wind_dim'],
+        landscape_dim=model_cfg['landscape_dim'],
+        hidden_dim=model_cfg['hidden_dim'],
+        layers=model_cfg['layers'],
+        heads=model_cfg['heads'],
+        head_dim=model_cfg['heads'],
+        window_size=model_cfg['windows_size'],
+        dropout=model_cfg['dropout']
+    )
 
     trainer = pl.Trainer(
             max_epoch=train_config['max_epochs'],

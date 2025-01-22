@@ -1,0 +1,8 @@
+wind_dim: 2
+landscape_dim: 8
+hidden_dim: 512
+layers: [2, 2]
+heads: [3, 6]
+head_dim: 32
+window_size: [7, 7, 7]
+dropout: 0.1
