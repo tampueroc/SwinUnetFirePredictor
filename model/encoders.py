@@ -16,7 +16,7 @@ class SwinBlock3D(nn.Module):
 class Encoder(nn.Module):
     def __init__(self, in_channels, dim, layers, downscale_factor, heads, head_dim, window_size, dropout=0.0):
         super().__init__()
-        self.patch_merge = nn.Conv3d(in_channels, dim, kernel_size=downscale_factor, stride=downscale_factor)
+        self.patch_merge = nn.Conv3d(in_channels, dim, kernel_size=(1, downscale_factor, downscale_factor), stride=(1, downscale_factor, downscale_factor))
         self.layers = nn.ModuleList([
             SwinBlock3D(dim, heads, head_dim, mlp_dim=dim * 4, shifted=(i % 2 == 1), window_size=window_size, dropout=dropout) for i in range(layers)
         ])
