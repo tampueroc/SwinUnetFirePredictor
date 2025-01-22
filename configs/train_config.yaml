@@ -14,7 +14,6 @@ callbacks:
     patience: 5
     mode: min
     min_delta: 0.01
-
-  image_prediction_logger:
+  image_logger:
     enabled: true
 

@@ -4,7 +4,7 @@ import pytorch_lightning as pl
 
 from utils import Logger
 from data import FireDataModule
-from callbacks import EarlyStoppingHandler, ImagePredictionLogger
+from callbacks import EarlyStoppingHandler, ImageLoggerHandler
 from model import SwinUnetFirePredictor
 
 def load_yaml_config(path):
@@ -18,7 +18,7 @@ def main(args):
     logger_config = train_config['logger']
     callbacks_config = train_config['callbacks']
     early_stopper_config = callbacks_config['early_stopper']
-    image_prediction_logger_config = callbacks_config['image_prediction_logger']
+    image_logger_config = callbacks_config['image_logger']
 
     # Logger
     logger = Logger.get_tensorboard_logger(
@@ -36,8 +36,8 @@ def main(args):
             min_delta=early_stopper_config['min_delta']
         )
         callbacks.append(early_stopping_callback)
-    if image_prediction_logger_config.get('enabled', False) is True:
-        image_prediction_logger_callback = ImagePredictionLogger()
+    if image_logger_config.get('enabled', False) is True:
+        image_prediction_logger_callback = ImageLoggerHandler()
         callbacks.append(image_prediction_logger_callback)
 
     # Datamodule
