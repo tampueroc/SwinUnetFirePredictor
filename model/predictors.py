@@ -42,7 +42,7 @@ class SwinUnetFirePredictor(pl.LightningModule):
         self.wind_fc = nn.Linear(wind_dim, hidden_dim)
         self.decoder = Decoder(hidden_dim, 1, layers[1], 4, heads[1], head_dim, window_size, dropout)
 
-    def forward(self, fire_sequence, wind_sequence, landscape_features, valid_tokens):
+    def forward(self, fire_sequence, landscape_features, wind_sequence, valid_tokens):
         wind_latent = self.wind_fc(wind_sequence.mean(dim=1))
         wind_latent = rearrange(wind_latent, 'b d -> b d 1 1 1')
 
