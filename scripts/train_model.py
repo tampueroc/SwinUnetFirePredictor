@@ -84,5 +84,6 @@ if __name__ == "__main__":
     parser.add_argument("--global_config", default="configs/global_config.yaml", help="Path to global config.")
     parser.add_argument("--train_config", default="configs/train_config.yaml", help="Path to training config.")
     parser.add_argument("--data_config", default="configs/data_config.yaml", help="Path to data config.")
+    parser.add_argument("--model_cfg", default="configs/model_cfg.yaml", help="Path to model config.")
     args = parser.parse_args()
     main(args)
