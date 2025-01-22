@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 
 class CyclicShift3D(nn.Module):
     def __init__(self, displacement):
