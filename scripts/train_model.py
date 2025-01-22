@@ -3,7 +3,7 @@ import argparse
 import pytorch_lightning as pl
 
 from utils import Logger
-from ..data import FireDataModule
+from data import FireDataModule
 from callbacks import EarlyStoppingHandler, ImagePredictionLogger
 from model import SwinUnetFirePredictor
 
