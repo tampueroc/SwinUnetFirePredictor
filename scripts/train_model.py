@@ -66,7 +66,7 @@ def main(args):
     )
 
     trainer = pl.Trainer(
-            max_epoch=train_config['max_epochs'],
+            max_epoch=train_config['max_epoch'],
             accelerator=train_config['accelerator'],
             devices=train_config['devices'],
             precision=train_config['precision'],
