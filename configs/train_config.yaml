@@ -1,0 +1,20 @@
+max_epochs: 50
+accelerator: gpu
+devices: [0]
+precision: 16-mixed
+
+logger:
+  dir: logs
+  name: swinunet_fire_predictor
+
+callbacks:
+  early_stopper:
+    enabled: true
+    monitor: val_loss
+    patience: 5
+    mode: min
+    min_delta: 0.01
+
+  image_prediction_logger:
+    enabled: true
+

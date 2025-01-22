@@ -1,0 +1,7 @@
+data_dir: data/deep_crown_dataset/organized_spreads
+sequence_length: 6
+batch_size: 16
+num_workers: 4
+drop_last: true
+pin_memory: true
+
