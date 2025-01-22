@@ -38,7 +38,7 @@ class SwinUnetFirePredictor(pl.LightningModule):
         self.val_recall = torchmetrics.classification.BinaryRecall()
         self.val_f1 = torchmetrics.classification.BinaryF1Score()
 
-        self.encoder = Encoder(in_channels + landscape_dim, hidden_dim, layers[0], 4, heads[0], head_dim, window_size, dropout)
+        self.encoder = Encoder(1 + landscape_dim, hidden_dim, layers[0], 4, heads[0], head_dim, window_size, dropout)
         self.wind_fc = nn.Linear(wind_dim, hidden_dim)
         self.decoder = Decoder(hidden_dim, 1, layers[1], 4, heads[1], head_dim, window_size, dropout)
 
