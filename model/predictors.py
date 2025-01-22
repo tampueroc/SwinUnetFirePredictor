@@ -46,6 +46,10 @@ class SwinUnetFirePredictor(pl.LightningModule):
         wind_latent = self.wind_fc(wind_sequence.mean(dim=1))
         wind_latent = rearrange(wind_latent, 'b d -> b d 1 1 1')
 
+        # Align temporal dimensions of landscape_features and fire_sequence
+        landscape_features = landscape_features[:, :, :fire_sequence.size(2), :, :]
+        assert landscape_features.size(2) == fire_sequence.size(2), "Temporal dimension mismatch"
+
         landscape_repeated = landscape_features.unsqueeze(2).repeat(1, 1, fire_sequence.size(2), 1, 1)
         fire_landscape_combined = torch.cat([fire_sequence, landscape_repeated], dim=1)
 
@@ -73,6 +77,27 @@ class SwinUnetFirePredictor(pl.LightningModule):
         self.log("train_precision", self.train_precision, on_step=True, on_epoch=False)
         self.log("train_recall", self.train_recall, on_step=True, on_epoch=False)
         self.log("train_f1", self.train_f1, on_step=True, on_epoch=False)
+        return {"loss": loss, "predictions": pred, "targets": isochrone_mask}
+
+    def validation_step(self, batch, batch_idx):
+        fire_seq, static_data, wind_inputs, isochrone_mask, valid_tokens = batch
+        pred = self(fire_seq, static_data, wind_inputs, valid_tokens)
+        loss = self.loss_fn(pred, isochrone_mask)
+        self.log("val_loss", loss, prog_bar=True)
+
+        # Update Metrics
+        pred_binary = (torch.sigmoid(pred) > 0.5).float()
+        # Flatten
+        pred_binary = pred_binary.flatten()
+        isochrone_mask_flattened = isochrone_mask.flatten().int()
+        self.val_accuracy(pred_binary, isochrone_mask_flattened)
+        self.val_precision(pred_binary, isochrone_mask_flattened)
+        self.val_recall(pred_binary, isochrone_mask_flattened)
+        self.val_f1(pred_binary, isochrone_mask_flattened)
+        self.log("val_accuracy", self.val_accuracy, on_step=False, on_epoch=True)
+        self.log("val_precision", self.val_precision, on_step=False, on_epoch=True)
+        self.log("val_recall", self.val_recall, on_step=False, on_epoch=True)
+        self.log("val_f1", self.val_f1, on_step=False, on_epoch=True)
         return {"loss": loss, "predictions": pred, "targets": isochrone_mask}
 
     def configure_optimizers(self):
