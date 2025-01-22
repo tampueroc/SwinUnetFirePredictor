@@ -60,10 +60,12 @@ class WindowAttention3D(nn.Module):
         self.to_out = nn.Linear(inner_dim, dim)
 
     def forward(self, x):
+        # Rearrange x to have feature dimension (C) as the last axis
+        b, c, d, h, w = x.shape  # [batch_size, channels, depth, height, width]
+        x = rearrange(x, 'b c d h w -> b (d h w) c')  # Shape: [B, D*H*W, C]
         if self.shifted:
             x = self.cyclic_shift(x)
 
-        b, *shape, _ = x.shape
         qkv = self.to_qkv(x).chunk(3, dim=-1)
         q, k, v = map(lambda t: rearrange(t, 'b ... (h d) -> b h (...) d', h=self.heads), qkv)
 
