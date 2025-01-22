@@ -1,5 +1,5 @@
 import torch.nn as nn
-from .swin_blocks import SwinBlock3D
+from .encoders import SwinBlock3D
 
 class Decoder(nn.Module):
     def __init__(self, in_channels, out_channels, layers, up_scale_factor, heads, head_dim, window_size, dropout=0.0):
