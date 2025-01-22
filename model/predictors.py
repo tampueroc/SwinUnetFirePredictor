@@ -46,11 +46,14 @@ class SwinUnetFirePredictor(pl.LightningModule):
         wind_latent = self.wind_fc(wind_sequence.mean(dim=1))
         wind_latent = rearrange(wind_latent, 'b d -> b d 1 1 1')
 
-        # Align temporal dimensions of landscape_features and fire_sequence
-        landscape_features = landscape_features[:, :, :fire_sequence.size(2), :, :]
+        # Shape: [B, T, C, H, W]
+        landscape_features = landscape_features.repeat(1, fire_sequence.size(1), 1, 1, 1)
         assert landscape_features.size(2) == fire_sequence.size(2), "Temporal dimension mismatch"
 
-        fire_landscape_combined = torch.cat([fire_sequence, landscape_features], dim=1)
+        # Shape: [B, T, C_fire + C_landscape, H, W]
+        fire_landscape_combined = torch.cat([fire_sequence, landscape_features], dim=2)
+        # Shape: [B, C_total, T, H, W]
+        fire_landscape_combined = fire_landscape_combined.permute(0, 2, 1, 3, 4)
 
         encoded = self.encoder(fire_landscape_combined)
         encoded += wind_latent
