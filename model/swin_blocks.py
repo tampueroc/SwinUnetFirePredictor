@@ -1,4 +1,5 @@
 from torch import nn, einsum
+import numpy as np
 from einops import rearrange
 from typing import Union, List
 
@@ -47,7 +48,7 @@ class WindowAttention3D(nn.Module):
         self.shifted = shifted
 
         if self.shifted:
-            displacement = [s // 2 for s in window_size]
+            displacement = np.array([s // 2 for s in window_size])
             self.cyclic_shift = CyclicShift3D(-displacement)
             self.cyclic_back_shift = CyclicShift3D(displacement)
 
