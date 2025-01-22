@@ -2,6 +2,7 @@ max_epochs: 50
 accelerator: gpu
 devices: [0]
 precision: 16-mixed
+learning_rate: 0.001
 
 logger:
   dir: logs

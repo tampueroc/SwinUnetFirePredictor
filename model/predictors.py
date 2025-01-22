@@ -10,11 +10,12 @@ from .utils.loss_functions import WeightedFocalLoss, BCEWithWeights
 
 
 class SwinUnetFirePredictor(pl.LightningModule):
-    def __init__(self, in_channels, wind_dim, landscape_dim, hidden_dim, layers, heads, head_dim, window_size, dropout=0.0, loss_type='bce'):
+    def __init__(self, in_channels, wind_dim, landscape_dim, hidden_dim, layers, heads, head_dim, window_size, dropout=0.0, loss_type='bce', learning_rate=0.001):
         super().__init__()
         self.save_hyperparameters()
 
         # Loss Function
+        self.learning_rate = learning_rate
         if loss_type == "focal":
             alpha = 0.25
             gamma = 2.0
@@ -73,3 +74,5 @@ class SwinUnetFirePredictor(pl.LightningModule):
         self.log("train_f1", self.train_f1, on_step=True, on_epoch=False)
         return {"loss": loss, "predictions": pred, "targets": isochrone_mask}
 
+    def configure_optimizers(self):
+        return optim.Adam(self.parameters(), lr=self.learning_rate)

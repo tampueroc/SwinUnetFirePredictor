@@ -62,7 +62,8 @@ def main(args):
         heads=model_cfg['heads'],
         head_dim=model_cfg['head_dim'],
         window_size=model_cfg['window_size'],
-        dropout=model_cfg['dropout']
+        dropout=model_cfg['dropout'],
+        learning_rate=train_config['learning_rate']
     )
 
     trainer = pl.Trainer(
