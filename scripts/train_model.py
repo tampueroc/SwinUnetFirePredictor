@@ -61,7 +61,7 @@ def main(args):
         layers=model_cfg['layers'],
         heads=model_cfg['heads'],
         head_dim=model_cfg['heads'],
-        window_size=model_cfg['windows_size'],
+        window_size=model_cfg['window_size'],
         dropout=model_cfg['dropout']
     )
 
