@@ -48,7 +48,6 @@ class SwinUnetFirePredictor(pl.LightningModule):
 
         # Shape: [B, T, C, H, W]
         landscape_features = landscape_features.repeat(1, fire_sequence.size(1), 1, 1, 1)
-        assert landscape_features.size(2) == fire_sequence.size(2), "Temporal dimension mismatch"
 
         # Shape: [B, T, C_fire + C_landscape, H, W]
         fire_landscape_combined = torch.cat([fire_sequence, landscape_features], dim=2)
