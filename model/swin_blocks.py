@@ -65,9 +65,9 @@ class WindowAttention3D(nn.Module):
     def forward(self, x):
         # Rearrange x to have feature dimension (C) as the last axis
         b, c, d, h, w = x.shape  # [batch_size, channels, depth, height, width]
-        x = rearrange(x, 'b c d h w -> b (d h w) c')  # Shape: [B, D*H*W, C]
         if self.shifted:
             x = self.cyclic_shift(x)
+        x = rearrange(x, 'b c d h w -> b (d h w) c')  # Shape: [B, D*H*W, C]
 
         qkv = self.to_qkv(x)
         q, k, v = qkv.chunk(3, dim=-1)  # Split into query, key, value
