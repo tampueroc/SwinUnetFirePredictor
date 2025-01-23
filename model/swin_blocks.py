@@ -84,9 +84,8 @@ class WindowAttention3D(nn.Module):
         # Merge heads and project back
         out = rearrange(out, 'b h n d -> b n (h d)')  # [B, tokens, inner_dim]
         out = self.to_out(out)  # Project to original feature size
-        if self.shifted:
-            out = self.cyclic_back_shift(out)
-
         # Rearrange back to original spatial shape
         out = rearrange(out, 'b (d h w) c -> b c d h w', d=d, h=h, w=w)  # Restore to [B, C, D, H, W]
+        if self.shifted:
+            out = self.cyclic_back_shift(out)
         return out
