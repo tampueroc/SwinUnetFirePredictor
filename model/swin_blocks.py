@@ -1,4 +1,5 @@
 from torch import nn, einsum
+import pdb
 import numpy as np
 from einops import rearrange
 from typing import Union, List
@@ -80,6 +81,7 @@ class WindowAttention3D(nn.Module):
         dots = einsum('b h i d, b h j d -> b h i j', q, k) * self.scale  # [B, heads, tokens, tokens]
         attn = self.softmax(dots)  # Softmax over tokens
         out = einsum('b h i j, b h j d -> b h i d', attn, v)  # [B, heads, tokens, head_dim]
+        pdb.set_trace()
 
         # Merge heads and project back
         out = rearrange(out, 'b h n d -> b n (h d)')  # [B, tokens, inner_dim]
@@ -87,5 +89,6 @@ class WindowAttention3D(nn.Module):
         # Rearrange back to original spatial shape
         out = rearrange(out, 'b (d h w) c -> b c d h w', d=d, h=h, w=w)  # Restore to [B, C, D, H, W]
         if self.shifted:
+            pdb.set_trace()
             out = self.cyclic_back_shift(out)
         return out
